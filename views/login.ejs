@@ -1,0 +1,69 @@
+<% layout("layouts/boilerplate") %>
+
+<style>
+  /* Change the selector from 'body' to '.login-container' */
+  .login-container {
+    background: linear-gradient(to right, #f8f9fa, #e9ecef);
+    min-height: calc(100vh - 75px); /* Adjust height to account for navbar */
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .login-card {
+    max-width: 400px;
+    width: 100%;
+    padding: 2rem;
+    border-radius: 12px;
+    background-color: #fff;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  }
+
+  .login-card h2 {
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    color: #343a40;
+  }
+
+  .btn-primary {
+    background-color: #007bff;
+    border: none;
+  }
+
+  .btn-primary:hover {
+    background-color: #0056b3;
+  }
+
+  .create-account {
+    text-decoration: none;
+    color: #6c757d;
+  }
+
+  .create-account:hover {
+    text-decoration: underline;
+    color: #007bff;
+  }
+</style>
+
+<div class="login-container">
+  <div class="login-card">
+    <h2 class="text-center">Welcome Back</h2>
+    <p class="text-center text-muted mb-4">Login to continue shopping</p>
+    
+    <form action="/login" method="POST">
+      <div class="mb-3">
+        <label for="username" class="form-label">Username</label>
+        <input type="text" name="username" class="form-control" id="username" placeholder="Enter your username" required>
+      </div>
+      <div class="mb-3">
+        <label for="password" class="form-label">Password</label>
+        <input type="password" name="password" class="form-control" id="password" placeholder="Enter your password" required>
+      </div>
+      <button type="submit" class="btn btn-primary w-100 mb-3">Login</button>
+      <div class="text-center">
+        <a href="/register" class="create-account">Create a new account</a>
+      </div>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,223 @@
+/* --- NEW: Hero Section Styling --- */
+.cart-hero {
+    position: relative;
+    padding: 4rem 2rem; /* Adds space inside the hero */
+    margin-bottom: 2.5rem; /* Space between hero and cart items */
+    background-image: url('https://images.unsplash.com/photo-1588964895597-cf29b4b45038?q=80&w=2070&auto=format&fit=crop');
+    background-size: cover;
+    background-position: center;
+    border-radius: 16px; /* Rounded corners */
+    color: #ffffff;
+    text-align: center;
+    overflow: hidden; /* Ensures overlay fits within rounded corners */
+}
+
+/* This creates the dark overlay for better text readability */
+.cart-hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
+    z-index: 1;
+}
+
+/* This ensures the text appears above the overlay */
+.hero-content {
+    position: relative;
+    z-index: 2;
+}
+
+.hero-content h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+}
+
+.hero-content p {
+    font-size: 1.1rem;
+    opacity: 0.9;
+}
+
+/* /// */
+body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f5f8fa;
+      color: #333;
+    }
+    header {
+      background: #2c7be5;
+      color: white;
+      padding: 15px;
+      text-align: center;
+      font-size: 1.4em;
+      font-weight: bold;
+    }
+    .container {
+      max-width: 900px;
+      margin: auto;
+      padding: 20px;
+    }
+    .cart-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: white;
+      padding: 15px;
+      margin-bottom: 10px;
+      border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    .cart-item img {
+      width: 60px;
+      height: 60px;
+      border-radius: 10px;
+      object-fit: cover;
+      margin-right: 15px;
+    }
+    .cart-info {
+      flex: 1;
+    }
+    .cart-actions button {
+      background: #2c7be5;
+      border: none;
+      color: white;
+      padding: 6px 12px;
+      margin: 0 3px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .cart-actions button:hover {
+      background: #155ab6;
+    }
+    .total {
+      text-align: right;
+      font-size: 1.3em;
+      margin: 20px 0;
+      font-weight: bold;
+    }
+    .btn {
+      display: inline-block;
+      padding: 12px 18px;
+      margin: 10px 5px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 1em;
+    }
+    .btn-primary {
+      background: #2c7be5;
+      color: white;
+    }
+    .btn-primary:hover {
+      background: #155ab6;
+    }
+    .btn-secondary {
+      background: #6c757d;
+      color: white;
+    }
+    .scanner {
+      text-align: center;
+      padding: 50px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    .scanner video {
+      width: 80%;
+      border-radius: 12px;
+      border: 3px solid #2c7be5;
+    }
+    .checkout {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    .checkout h2 {
+      margin-top: 0;
+      color: #2c7be5;
+    }
+    .payment-options button {
+      margin: 10px;
+      padding: 12px 20px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      font-size: 1em;
+    }
+    .upi { background: #28a745; color: white; }
+    .card { background: #ffc107; color: black; }
+    .cash { background: #17a2b8; color: white; }
+
+
+
+/* navbar */
+body{
+   display: flex;
+   flex-direction: column;
+   min-height: 100vh;
+}
+
+.container{
+    flex:1;
+}
+
+.navbar{
+    height:5rem  !important;;
+    background-color:white !important;
+}
+.navbar-brand {
+   
+    font-size: 2rem !important;
+}
+
+.nav-link{
+    color: #222222 !important;
+}
+.nav-link {
+    margin-right: 20px;   /* Adjust spacing */
+    color: #222 !important;
+    font-weight: 500;
+}
+/* //Scanner */
+
+.scanner {
+    width: 400px;
+    height: auto; /* allow content to expand */
+    margin: 40px auto;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    text-align: center;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Inner camera square */
+.camera-box {
+    width: 300px;
+    height: 300px;
+    border: 2px solid #2c7be5;
+    border-radius: 10px;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #000; /* black background before camera loads */
+    margin-bottom: 15px;
+}
+
+.camera-box video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: none; /* hidden until scan starts */
+}
+.my-btn{
+  margin-left:20px !important;
+}

@@ -1,0 +1,36 @@
+<%layout("/layouts/boilerplate") %>
+<div class="container"> 
+  <h2 style="margin-top:2px;">Scanner</h2>
+  <div class="scanner">
+    <!-- Camera box -->
+    <div class="camera-box">
+      <video id="camera" autoplay muted playsinline></video>
+    </div>
+
+    <!-- Instructions + Button -->
+    <p id="scan-text">Align product within the frame...</p>
+    <button class="btn btn-primary" id="startScan">Start Scan</button>
+  </div>
+</div>
+<button class="btn btn-primary"> Add Item</button>
+<script>
+  const startBtn = document.getElementById("startScan");
+  const video = document.getElementById("camera");
+  const scanText = document.getElementById("scan-text");
+
+  startBtn.addEventListener("click", async () => {
+    try {
+      // Ask for camera permission & start video
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      video.srcObject = stream;
+
+      // Show video, hide text
+      video.style.display = "block";
+      scanText.style.display = "none";
+      startBtn.style.display = "none"; // hide button after starting
+    } catch (err) {
+      alert("Camera access denied or not available!");
+      console.error(err);
+    }
+  });
+</script>
