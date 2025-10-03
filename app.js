@@ -1,6 +1,5 @@
-// Load Environment Variables
+// ====================== app.js ======================
 require("dotenv").config();
-
 const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
@@ -10,23 +9,22 @@ const LocalStrategy = require("passport-local");
 const path = require("path");
 const ejsMate = require("ejs-mate");
 const flash = require("connect-flash");
+const MongoStore = require("connect-mongo");
 
 // Models
-const Product = require("./models/product.js");
-const User = require("./models/user.js");
+const User = require("./models/user");
+const Product = require("./models/product");
 
-// ENV Variables
+// ================== ENV VARIABLES ==================
 const PORT = process.env.PORT || 8080;
 const MONGO_URI = process.env.MONGO_URI;
 const SESSION_SECRET = process.env.SESSION_SECRET || "defaultsecret";
 
-// ================== DB Connection ==================
+// ================== DB CONNECTION ==================
 mongoose
-  .connect(process.env.MONGO_URI, {
+  .connect(MONGO_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
-    tls: true,
-    tlsAllowInvalidCertificates: false, // keep false for security
   })
   .then(() => console.log("✅ Connected to MongoDB"))
   .catch((err) => {
@@ -34,74 +32,73 @@ mongoose
     process.exit(1);
   });
 
-
-// ================== View Engine ==================
+// ================== VIEW ENGINE ==================
+app.engine("ejs", ejsMate);
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "/views"));
-app.engine("ejs", ejsMate);
 
-// ================== Middlewares ==================
+// ================== MIDDLEWARES ==================
 app.use(express.static(path.join(__dirname, "/public")));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
+// ================== TRUST PROXY ==================
+app.set("trust proxy", 1); // Required for Render to handle secure cookies
+
+// ================== SESSION ==================
 app.use(
   session({
+    name: "session",
     secret: SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
+    store: MongoStore.create({
+      mongoUrl: MONGO_URI,
+      collectionName: "sessions",
+    }),
     cookie: {
-      httpOnly: true, // Prevent client-side JS access
+      httpOnly: true,
+      //  secure: false,
+      secure: process.env.NODE_ENV === "production",
       
-      secure: process.env.NODE_ENV === "production", // Secure cookies in production
+      sameSite: "lax",
       maxAge: 1000 * 60 * 60 * 24, // 1 day
     },
   })
 );
 
+// ================== FLASH ==================
 app.use(flash());
 
-// ================== Passport ==================
+// ================== PASSPORT ==================
 app.use(passport.initialize());
 app.use(passport.session());
 passport.use(new LocalStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
-// Globals for Templates
+// ================== GLOBAL VARIABLES ==================
 app.use((req, res, next) => {
   res.locals.success = req.flash("success");
   res.locals.error = req.flash("error");
-  res.locals.currentUser = req.user;
+  res.locals.currentUser = req.user || null;
   next();
 });
 
-// ================== Routes ==================
+// ================== ROUTES ==================
 
 // Home
 app.get("/", (req, res) => {
-  res.render("home.ejs");
+  res.render("home");
 });
 
-// Show All Items
-app.get("/listings", isLoggedIn, async (req, res) => {
-  const products = await Product.find({});
-  res.render("list.ejs", { products });
-});
-
-// Checkout Page
-app.get("/checkOut", isLoggedIn, (req, res) => {
-  res.render("pay.ejs");
-});
-
-// Register User
+// Register
 app.get("/register", (req, res) => res.render("register"));
 app.post("/register", async (req, res, next) => {
   try {
     const { username, email, password } = req.body;
     const user = new User({ username, email });
     const registeredUser = await User.register(user, password);
-
     req.login(registeredUser, (err) => {
       if (err) return next(err);
       req.flash("success", "Welcome! You are now registered.");
@@ -113,7 +110,7 @@ app.post("/register", async (req, res, next) => {
   }
 });
 
-// Login User
+// Login
 app.get("/login", (req, res) => res.render("login"));
 app.post(
   "/login",
@@ -136,58 +133,31 @@ app.get("/logout", (req, res, next) => {
   });
 });
 
-// Profile
+// Listings (Protected)
+app.get("/listings", isLoggedIn, async (req, res) => {
+  const products = await Product.find({});
+  res.render("list", { products });
+});
+
+// Profile (Protected)
 app.get("/profile", isLoggedIn, (req, res) => {
   res.send(`Welcome ${req.user.username}, your email is ${req.user.email}`);
 });
 
-// ================== API Routes (Smart Cart) ==================
-function authenticateApiKey(req, res, next) {
-  const authHeader = req.headers["authorization"];
-  const apiKey = authHeader && authHeader.split(" ")[1];
-
-  if (apiKey === process.env.API_KEY) return next();
-  res.status(401).json({ message: "Unauthorized: Invalid API Key" });
-}
-
-app.post("/api/cart/add", authenticateApiKey, async (req, res) => {
-  try {
-    const { userId, productId } = req.body;
-    if (!userId || !productId)
-      return res.status(400).json({ message: "Missing userId or productId" });
-
-    const user = await User.findById(userId);
-    if (!user) return res.status(404).json({ message: "User not found" });
-
-    const product = await Product.findById(productId);
-    if (!product) return res.status(404).json({ message: "Product not found" });
-
-    // Prevent duplicate entries
-    const alreadyInCart = user.cart.some(
-      (item) => item.toString() === productId.toString()
-    );
-    if (alreadyInCart)
-      return res.status(400).json({ message: "Product already in cart" });
-
-    user.cart.push(product);
-    await user.save();
-
-    console.log(`📦 Product ${product.title} added to ${user.username}'s cart`);
-    res.status(200).json({ success: true, message: "Product added to cart" });
-  } catch (error) {
-    console.error("API Error:", error);
-    res.status(500).json({ message: "Internal Server Error" });
-  }
+// ================== FLASH TEST ROUTE ==================
+app.get("/flash-test", (req, res) => {
+  req.flash("success", "🎉 Flash is working on Render!");
+  res.redirect("/");
 });
 
-// ================== Middleware ==================
+// ================== MIDDLEWARE ==================
 function isLoggedIn(req, res, next) {
   if (req.isAuthenticated()) return next();
   req.flash("error", "You must be signed in to access that page.");
   res.redirect("/login");
 }
 
-// ================== Server ==================
+// ================== SERVER ==================
 app.listen(PORT, () => {
   console.log(`🚀 Server running at http://localhost:${PORT}`);
 });
