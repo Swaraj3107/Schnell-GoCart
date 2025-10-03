@@ -52,7 +52,7 @@ app.use(
     saveUninitialized: false,
     cookie: {
       httpOnly: true, // Prevent client-side JS access
-      secure: false,
+      
       secure: process.env.NODE_ENV === "production", // Secure cookies in production
       maxAge: 1000 * 60 * 60 * 24, // 1 day
     },
