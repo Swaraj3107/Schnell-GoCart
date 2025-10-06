@@ -11,11 +11,9 @@
                     <div class="card-body">
                         <h5 class="card-title"><%= product.title %></h5>
                         <p>₹<%= product.price %></p>
-                        <form action="/addItem" method="POST">
-                            <input type="hidden" name="title" value="<%= product.title %>">
-                            <input type="hidden" name="price" value="<%= product.price %>">
-                            <button type="submit" class="btn btn-primary">Add to Cart</button>
-                        </form>
+                        <form action="/cart/add/<%= product._id %>" method="POST">
+                           <button type="submit" class="btn btn-primary">Add to Cart</button>
+                         </form>
                     </div>
                 </div>
             </div>
@@ -24,3 +22,4 @@
 
     <a href="/checkOut" class="btn btn-success mt-3">Go to Checkout</a>
 </div>
+

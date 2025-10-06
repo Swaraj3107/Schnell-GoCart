@@ -92,6 +92,45 @@ app.get("/", (req, res) => {
   res.render("home");
 });
 
+// In app.js
+function authenticateApiKey(req, res, next) {
+    const authHeader = req.headers['authorization'];
+    // Expected header format: "Authorization: ApiKey your-super-secret-random-string"
+    const apiKey = authHeader && authHeader.split(' ')[1];
+
+    if (apiKey === process.env.API_KEY) {
+        next(); // Key is valid, proceed
+    } else {
+        res.status(401).json({ message: "Unauthorized: Invalid API Key" });
+    }
+}
+// Add Item to User's Cart (Protected)
+app.post("/cart/add/:id", isLoggedIn, async (req, res) => {
+  try {
+    // Get the product ID from the URL parameters
+    const productId = req.params.id;
+    
+    // req.user is the currently logged-in user, provided by Passport
+    const user = req.user;
+
+    // Add the product's ObjectId to the user's cart array
+    user.cart.push(productId);
+
+    // Save the updated user to the database
+    await user.save();
+
+    // Flash a success message
+    req.flash("success", "Item successfully added to your cart!");
+
+    // Redirect back to the listings page
+    res.redirect("/listings");
+  } catch (e) {
+    req.flash("error", "Something went wrong. Could not add item to cart.");
+    res.redirect("/listings");
+  }
+});
+
+
 // Register
 app.get("/register", (req, res) => res.render("register"));
 app.post("/register", async (req, res, next) => {
